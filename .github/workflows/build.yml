@@ -1,0 +1,43 @@
+name: Build Minecraft MOD STUDIO AI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download project
+        uses: actions/checkout@v4
+
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Extract project
+        run: |
+          mkdir source
+          unzip -q *.zip -d source
+          find source -name settings.gradle -print
+
+      - name: Build APK
+        run: |
+          cd source/Minecraft_MOD_STUDIO_AI
+          gradle assembleDebug
+
+      - name: Save APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Minecraft-MOD-STUDIO-AI-APK
+          path: source/Minecraft_MOD_STUDIO_AI/app/build/outputs/apk/debug/*.apk
